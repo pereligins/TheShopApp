@@ -1,8 +1,11 @@
 import React from 'react';
-import {View, Text, FlatList} from "react-native";
+import {View, Text, FlatList, Platform} from "react-native";
 import {useSelector, useDispatch} from "react-redux";
 import ProductItem from "../../components/shop/ProductItem";
-import * as cartActions from "../../store/actions/cart"
+import * as cartActions from "../../store/actions/cart";
+import {HeaderButtons, Item} from "react-navigation-header-buttons";
+
+import HeaderButton from "../../components/UI/HeaderButton";
 
 const ProductsOverviewScreen = props => {
 
@@ -15,7 +18,7 @@ const ProductsOverviewScreen = props => {
         renderItem={itemData => {
             return <ProductItem image={itemData.item.imageUrl}
                                 title={itemData.item.title}
-                                price={itemData.item.price}a
+                                price={itemData.item.price} a
                                 onViewDetail={() => {
                                     props.navigation.navigate('ProductDetail',
                                         {
@@ -23,7 +26,7 @@ const ProductsOverviewScreen = props => {
                                             productTitle: itemData.item.title
                                         });
                                 }}
-                                onAddToCard={() => {
+                                onAddToCart={() => {
                                     dispatch(cartActions.addToCart(itemData.item))
                                 }}
             />
@@ -33,8 +36,15 @@ const ProductsOverviewScreen = props => {
     />);
 }
 
-ProductsOverviewScreen.navigationOptions = {
-    headerTitle: 'All Products'
+ProductsOverviewScreen.navigationOptions = navData => {
+    return {headerTitle: 'All Products',
+        headerRight: (<HeaderButtons HeaderButtonComponent={HeaderButton}>
+        <Item title='Cart'
+              iconName={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
+              onPress={() => {
+                  navData.navigation.navigate('Cart');
+              }}/>
+    </HeaderButtons>)}
 }
 
 
