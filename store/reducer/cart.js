@@ -49,7 +49,7 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 items: updatedCartItems,
-                totalAmount: state.totalAmount + selectedCartItem.productPrice
+                totalAmount: state.totalAmount - selectedCartItem.productPrice
             }
         }
         case ADD_ORDER:
