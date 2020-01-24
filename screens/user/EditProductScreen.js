@@ -14,8 +14,8 @@ const formReducer = (state, action) => {
             [action.input]: action.value
         };
         const updatedValidities = {
-            ...state.updatedValidities,
-            [action.input]: action.isValid
+            ...state.inputValidities,
+            [action.input]: action.valid
         };
         let updatedFormIsValid = true;
         for (const key in updatedValidities) {
@@ -78,6 +78,7 @@ const EditProductScreen = props => {
         if (text.trim().length > 0) {
             isValid = true;
         }
+        console.log(formState);
         dispatchFormState({type: FORM_INPUT_UPDATE, value: text, valid: isValid, input: inputIdentifier});
     }
 
