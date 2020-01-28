@@ -1,9 +1,10 @@
 import React, {useCallback, useEffect, useReducer, useState} from "react";
-import {Alert, Platform, ScrollView, StyleSheet, Text, TextInput, View} from "react-native";
+import {Alert, Platform, ScrollView, StyleSheet, View, KeyboardAvoidingView} from "react-native";
 import {HeaderButtons, Item} from "react-navigation-header-buttons";
 import HeaderButton from "../../components/UI/HeaderButton";
 import {useDispatch, useSelector} from "react-redux";
 import * as productActions from '../../store/actions/products';
+import Input from "../../components/UI/Input";
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -73,54 +74,71 @@ const EditProductScreen = props => {
         props.navigation.setParams({submit: submitHandler});
     }, [submitHandler]);
 
-    const textChangeHandler = (inputIdentifier, text) => {
-        let isValid = false;
-        if (text.trim().length > 0) {
-            isValid = true;
-        }
-        console.log(formState);
-        dispatchFormState({type: FORM_INPUT_UPDATE, value: text, valid: isValid, input: inputIdentifier});
-    }
+    const inputChangeHandler = useCallback((inputIdentifier, inputValue, inputValidity) => {
+        dispatchFormState({type: FORM_INPUT_UPDATE, value: inputValue, valid: inputValidity, input: inputIdentifier});
+    }, [dispatchFormState]);
 
-    return <ScrollView>
-        <View style={styles.form}>
-            <View style={styles.formControl}>
-                <Text style={styles.label}>Title: </Text>
-                <TextInput style={styles.input}
-                           value={formState.inputValues.title}
-                           onChangeText={textChangeHandler.bind(this, 'title')}
-                           keyboardType='default'
-                           autoCapitalize='sentences'
-                           autoCorrect
-                           returnKeyType='next'
+    return <KeyboardAvoidingView style={{flex: 1}} behavior='padding' keyboardVerticalOffset={100}>
+        <ScrollView>
+            <View style={styles.form}>
+
+                <Input
+                    id='title'
+                    label='Title'
+                    errorText='Invalid title'
+                    keyboardType='default'
+                    autoCapitalize='sentences'
+                    autoCorrect
+                    returnKeyType='next'
+                    onInputChange={inputChangeHandler}
+                    initialValue={editedProduct ? editedProduct.title : ''}
+                    initiallyValid={!!editedProduct}
+                    required
                 />
-                {!formState.inputValidities.title && <Text>Enter valid title!</Text>}
-            </View>
-            <View style={styles.formControl}>
-                <Text style={styles.label}>Image URL: </Text>
-                <TextInput style={styles.input}
-                           value={formState.inputValues.imageUrl}
-                           onChangeText={textChangeHandler.bind(this, 'imageUrl')}/>
-                {!formState.inputValidities.imageUrl && <Text>Enter valid url!</Text>}
-            </View>
-            {editedProduct ? null : (<View style={styles.formControl}>
-                <Text style={styles.label}>Price: </Text>
-                <TextInput style={styles.input}
-                           value={formState.inputValues.price}
-                           onChangeText={textChangeHandler.bind(this, 'price')}
-                           keyboardType='decimal-pad'
+
+                <Input
+                    id='imageUrl'
+                    label='Image URL'
+                    errorText='Invalid image url'
+                    keyboardType='default'
+                    returnKeyType='next'
+                    onInputChange={inputChangeHandler}
+                    initialValue={editedProduct ? editedProduct.imageURL : ''}
+                    initiallyValid={!!editedProduct}
+                    required
                 />
-                {!formState.inputValidities.price && <Text>Enter valid price!</Text>}
-            </View>)}
-            <View style={styles.formControl}>
-                <Text style={styles.label}>Description: </Text>
-                <TextInput style={styles.input}
-                           value={formState.inputValues.description}
-                           onChangeText={textChangeHandler.bind(this, 'description')}/>
-                {!formState.inputValidities.description && <Text>Enter valid description!</Text>}
+
+                {editedProduct ? null : (
+                    <Input
+                        id='price'
+                        label='Price'
+                        errorText='Invalid price'
+                        keyboardType='decimal-pad'
+                        returnKeyType='next'
+                        onInputChange={inputChangeHandler}
+                        required
+                        min={0.1}
+                    />
+                )}
+
+                <Input
+                    id='description'
+                    label='Description'
+                    errorText='Invalid description'
+                    keyboardType='default'
+                    autoCapitalize='sentences'
+                    autoCorrect
+                    multiline
+                    numberOfLines={3}
+                    onInputChange={inputChangeHandler}
+                    initialValue={editedProduct ? editedProduct.description : ''}
+                    initiallyValid={!!editedProduct}
+                    required
+                    minLength={5}
+                />
             </View>
-        </View>
-    </ScrollView>;
+        </ScrollView>
+    </KeyboardAvoidingView>;
 }
 
 EditProductScreen.navigationOptions = navData => {
@@ -138,19 +156,6 @@ EditProductScreen.navigationOptions = navData => {
 const styles = StyleSheet.create({
     form: {
         margin: 20
-    },
-    formControl: {
-        width: '100%'
-    },
-    label: {
-        fontFamily: 'open-sans-bold',
-        marginVertical: 8
-    },
-    input: {
-        paddingHorizontal: 2,
-        paddingVertical: 5,
-        borderBottomColor: '#ccc',
-        borderBottomWidth: 1
     }
 });
 
