@@ -7,24 +7,32 @@ export const SET_PRODUCTS = 'SET_PRODUCTS';
 
 export const fetchProducts = () => {
     return async dispatch => {
+        try {
+            const response = await fetch('https://udemy-education-project.firebaseio.com/products.json');
 
-        const response = await fetch('https://udemy-education-project.firebaseio.com/products.json');
+            if (!response.ok) {
+                throw new Error('Sometnhind went wrong.');
+            }
 
-        const responseData = await response.json();
+            const responseData = await response.json();
 
-        const loadedProducts = [];
+            const loadedProducts = [];
 
-        for (const key in responseData) {
-            loadedProducts.push(new Product(key,
-                'u1',
-                responseData[key].title,
-                responseData[key].imageUrl,
-                responseData[key].description,
-                responseData[key].price));
+            for (const key in responseData) {
+                loadedProducts.push(new Product(key,
+                    'u1',
+                    responseData[key].title,
+                    responseData[key].imageUrl,
+                    responseData[key].description,
+                    responseData[key].price));
+            }
+
+            dispatch({type: SET_PRODUCTS,
+                products: loadedProducts});
+        } catch (err) {
+            throw err;
         }
 
-        dispatch({type: SET_PRODUCTS,
-        products: loadedProducts});
     }
 };
 
@@ -68,13 +76,32 @@ export const createProduct = (title, description, imageUrl, price) => {
 }
 
 export const updateProduct = (id, title, description, imageUrl) => {
-    return {
-        type: UPDATE_PRODUCT,
-        pid: id,
-        productData: {
-            title: title,
-            description: description,
-            imageUrl: imageUrl
+
+    return async dispatch => {
+
+        await fetch('https://udemy-education-project.firebaseio.com/products/${id}.json', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title,
+                description,
+                imageUrl,
+                price
+            })
+        });
+
+        return {
+            type: UPDATE_PRODUCT,
+            pid: id,
+            productData: {
+                title: title,
+                description: description,
+                imageUrl: imageUrl
+            }
         }
     }
+
+
 }
