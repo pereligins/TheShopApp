@@ -103,7 +103,7 @@ const EditProductScreen = props => {
                     keyboardType='default'
                     returnKeyType='next'
                     onInputChange={inputChangeHandler}
-                    initialValue={editedProduct ? editedProduct.imageURL : ''}
+                    initialValue={editedProduct ? editedProduct.imageUrl : ''}
                     initiallyValid={!!editedProduct}
                     required
                 />

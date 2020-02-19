@@ -79,7 +79,7 @@ export const updateProduct = (id, title, description, imageUrl) => {
 
     return async dispatch => {
 
-        await fetch('https://udemy-education-project.firebaseio.com/products/${id}.json', {
+        await fetch(`https://udemy-education-project.firebaseio.com/products/${id}.json`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -87,12 +87,11 @@ export const updateProduct = (id, title, description, imageUrl) => {
             body: JSON.stringify({
                 title,
                 description,
-                imageUrl,
-                price
+                imageUrl
             })
         });
 
-        return {
+        dispatch({
             type: UPDATE_PRODUCT,
             pid: id,
             productData: {
@@ -100,7 +99,7 @@ export const updateProduct = (id, title, description, imageUrl) => {
                 description: description,
                 imageUrl: imageUrl
             }
-        }
+        });
     }
 
 
